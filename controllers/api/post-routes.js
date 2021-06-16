@@ -90,12 +90,16 @@ router.post('/', (req, res) => {
 
 // this must come before the /:id route to avoid "upvote" being considered a post id
 router.put('/upvote', (req, res) => {
-  Post.upvote(req.body, { Vote })
+  // make sure the session exists
+  if (req.session) {
+    // pass session id along with all destructured properties on req.body
+    Post.upvote({ ...req.body, user_id: req.session.user_id }, { Vote })
     .then(dbPostData => res.json(dbPostData))
     .catch(err => {
       console.log(err);
       res.status(400).json(err);
-    });
+    });    
+  }
 });
 
 router.put('/:id', (req, res) => {
